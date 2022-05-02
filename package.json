@@ -1,5 +1,5 @@
 {
-  "name": "template-ts-node-starter",
+  "name": "wordle-helper",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:jonpepler/template-ts-node-starter.git"
+    "url": "git@github.com:jonpepler/wordle-helper.git"
   },
   "devDependencies": {
     "@babel/core": "^7.14.3",
