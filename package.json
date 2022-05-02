@@ -9,14 +9,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@personal.github.com:jonpepler/template-ts-node-starter.git"
+    "url": "git@github.com:jonpepler/template-ts-node-starter.git"
   },
   "devDependencies": {
     "@babel/core": "^7.14.3",
     "@babel/preset-env": "^7.14.4",
     "@babel/preset-typescript": "^7.13.0",
     "@types/jest": "^26.0.23",
-    "@types/node": "^15.12.1",
+    "@types/node": "^15.14.9",
+    "@types/readline-sync": "^1.4.4",
     "@typescript-eslint/eslint-plugin": "^4.26.0",
     "@typescript-eslint/parser": "^4.26.0",
     "babel-jest": "^27.0.2",
@@ -38,5 +39,9 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "node-fetch": "^3.2.4",
+    "readline-sync": "^1.4.10"
+  }
 }
