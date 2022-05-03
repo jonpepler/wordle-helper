@@ -5,9 +5,13 @@ import { keyIn, keyInSelect } from 'readline-sync'
 import { Search } from './Search'
 import { getGuessFromString } from './util'
 
-const grey = (letter: string): string => `\u001b[40m${letter}\u001b[0m`
-const yellow = (letter: string): string => `\u001b[43;1m${letter}\u001b[0m`
-const green = (letter: string): string => `\u001b[42;1m${letter}\u001b[0m`
+const greyBackground = (letter: string): string =>
+  `\u001b[38;5;15;48;5;240m  ${letter} \u001b[0m`
+const yellowBackground = (letter: string): string =>
+  `\u001b[38;5;0;48;5;3m ${letter} \u001b[0m`
+const greenBackground = (letter: string): string =>
+  `\u001b[38;5;15;48;5;2m ${letter} \u001b[0m`
+
 const colourGuessString = (guess: string): string =>
   guess
     .toUpperCase()
@@ -15,10 +19,10 @@ const colourGuessString = (guess: string): string =>
     .slice(0, -1)
     .map((letter) =>
       letter[1] === '0'
-        ? grey(letter[0])
+        ? greyBackground(letter[0])
         : letter[1] === '1'
-        ? yellow(letter[0])
-        : green(letter[0])
+        ? yellowBackground(letter[0])
+        : greenBackground(letter[0])
     )
     .join('')
 
@@ -40,7 +44,8 @@ const runSearch = (solutions: string[]): void => {
     search.filter()
     search.report()
 
-    if (search.possibleSolutions.length > 1) loop([...wordList, colourGuessString(input)])
+    if (search.possibleSolutions.length > 1)
+      loop([...wordList, colourGuessString(input)])
   }
 
   loop()

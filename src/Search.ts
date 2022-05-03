@@ -87,13 +87,37 @@ export class Search {
     return this.possibleSolutions
   }
 
+  getGreenFilterLetters = (): string[] =>
+    this.filters
+      .filter(({ type }) => type === Colour.Green)
+      .map(({ letter }) => letter)
+
+  getYellowFilterLetters = (): string[] =>
+    this.filters
+      .filter(({ type }) => type === Colour.Yellow)
+      .map(({ letter }) => letter)
+
   report(): void {
+    const green = (letter: string): string => `\u001b[38;5;2m${letter}\u001b[0m`
+    const yellow = (letter: string): string =>
+      `\u001b[38;5;3m${letter}\u001b[0m`
     console.log()
     console.log('possible solutions: ', this.possibleSolutions.length)
+    const yellowLetters = this.getYellowFilterLetters()
+    const greenLetters = this.getGreenFilterLetters()
+    const solutions = this.possibleSolutions.map((word) =>
+      word
+        .split('')
+        .map((letter) =>
+          yellowLetters.includes(letter) ? yellow(letter) : letter
+        )
+        .map((letter) =>
+          greenLetters.includes(letter) ? green(letter) : letter
+        )
+        .join('')
+    )
     console.log(
-      this.possibleSolutions.length > 10
-        ? this.possibleSolutions.join(' ')
-        : this.possibleSolutions.join('\n')
+      solutions.length > 10 ? solutions.join(' ') : solutions.join('\n')
     )
   }
 }
