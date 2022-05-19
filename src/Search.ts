@@ -97,27 +97,63 @@ export class Search {
       .filter(({ type }) => type === Colour.Yellow)
       .map(({ letter }) => letter)
 
-  report(): void {
+  colourWord(
+    word: string,
+    yellowLetters: string[],
+    greenLetters: string[]
+  ): string {
     const green = (letter: string): string => `\u001b[38;5;2m${letter}\u001b[0m`
     const yellow = (letter: string): string =>
       `\u001b[38;5;3m${letter}\u001b[0m`
+
+    return word
+      .split('')
+      .map((letter) =>
+        yellowLetters.includes(letter) ? yellow(letter) : letter
+      )
+      .map((letter) => (greenLetters.includes(letter) ? green(letter) : letter))
+      .join('')
+  }
+
+  makeBestGuesses(
+    ignoreLetters: string[]
+  ): Array<{ word: string; score: number }> {
+    // todo: remove repeat letters in one word
+    const frequencies = this.possibleSolutions
+      .join('')
+      .split('')
+      .reduce<{ [letter: string]: number }>((total, letter) => {
+        if (!ignoreLetters.includes(letter))
+          total[letter] !== undefined ? total[letter]++ : (total[letter] = 1)
+        return total
+      }, {})
+    const score = (word: string): number =>
+      word
+        .split('')
+        .reduce((total, letter) => total + (frequencies[letter] ?? 0), 0)
+
+    return this.possibleSolutions
+      .map((word) => ({ word, score: score(word) }))
+      .sort((a, b) => b.score - a.score)
+  }
+
+  report(): void {
     console.log()
     console.log('possible solutions: ', this.possibleSolutions.length)
     const yellowLetters = this.getYellowFilterLetters()
     const greenLetters = this.getGreenFilterLetters()
     const solutions = this.possibleSolutions.map((word) =>
-      word
-        .split('')
-        .map((letter) =>
-          yellowLetters.includes(letter) ? yellow(letter) : letter
-        )
-        .map((letter) =>
-          greenLetters.includes(letter) ? green(letter) : letter
-        )
-        .join('')
+      this.colourWord(word, yellowLetters, greenLetters)
     )
     console.log(
       solutions.length > 10 ? solutions.join(' ') : solutions.join('\n')
+    )
+    const bestGuesses = this.makeBestGuesses(
+      yellowLetters.concat(greenLetters)
+    ).slice(0, 3)
+    console.log(
+      'Best guess: ' +
+        bestGuesses.map(({ word, score }) => `${word}(${score})`).join(', ')
     )
   }
 }
