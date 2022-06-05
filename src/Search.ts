@@ -118,7 +118,6 @@ export class Search {
   makeBestGuesses(
     ignoreLetters: string[]
   ): Array<{ word: string; score: number }> {
-    // todo: remove repeat letters in one word
     const frequencies = this.possibleSolutions
       .join('')
       .split('')
@@ -128,9 +127,10 @@ export class Search {
         return total
       }, {})
     const score = (word: string): number =>
-      word
-        .split('')
-        .reduce((total, letter) => total + (frequencies[letter] ?? 0), 0)
+      [...new Set(word.split(''))].reduce(
+        (total: number, letter) => total + (frequencies[letter] ?? 0),
+        0
+      )
 
     return this.possibleSolutions
       .map((word) => ({ word, score: score(word) }))
