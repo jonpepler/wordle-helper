@@ -1,6 +1,7 @@
 import https from 'https'
-
 import { keyIn, keyInSelect } from 'readline-sync'
+
+import * as cheerio from 'cheerio'
 
 import { Search } from './Search'
 import { getGuessFromString } from './util'
@@ -51,17 +52,55 @@ const runSearch = (solutions: string[]): void => {
   loop()
 }
 
-https.get(
-  'https://static.nytimes.com/newsgraphics/2022/01/25/wordle-solver/assets/solutions.txt',
-  (res) => {
-    console.log('fetching solutions...')
-    let stream = ''
-    res.on('data', (d) => {
-      // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-      stream += d.toString()
+const getPossibleSolutions = async (): Promise<string[]> => {
+  return await new Promise((resolve) => {
+    https.get(
+      'https://static.nytimes.com/newsgraphics/2022/01/25/wordle-solver/assets/solutions.txt',
+      (res) => {
+        let stream = ''
+        res.on('data', (d) => {
+          // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+          stream += d.toString()
+        })
+        res.on('end', () => {
+          resolve(stream.split('\n'))
+        })
+      }
+    )
+  })
+}
+
+const getPreviousSolutions = async (): Promise<string[]> => {
+  return await new Promise((resolve) => {
+    https.get('https://www.rockpapershotgun.com/wordle-past-answers', (res) => {
+      let stream = ''
+      res.on('data', (d) => {
+        // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+        stream += d.toString()
+      })
+      res.on('end', () => {
+        const $ = cheerio.load(stream)
+        const previousSolutionsHtml = $('.article_body_content > ul')
+          .slice(0, 2)
+          .text()
+          .split('\n')
+          .filter((text) => text !== '')
+        resolve(
+          [
+            ...previousSolutionsHtml.slice(0, 7).map((text) => text.slice(-5)),
+            ...previousSolutionsHtml.slice(7)
+          ].map((text) => text.toLowerCase())
+        )
+      })
     })
-    res.on('end', () => {
-      runSearch(stream.split('\n'))
-    })
-  }
-)
+  })
+}
+
+console.log('fetching solutions...')
+Promise.all([getPossibleSolutions(), getPreviousSolutions()])
+  .then(([possibleSolutions, previousSolutions]) => {
+    runSearch(
+      possibleSolutions.filter((word) => !previousSolutions.includes(word))
+    )
+  })
+  .catch((error) => console.error(error))
