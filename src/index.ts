@@ -29,6 +29,7 @@ const colourGuessString = (guess: string): string =>
 
 const runSearch = (solutions: string[]): void => {
   const search = new Search(solutions)
+  search.chooseStartingWord()
   const loop = (wordList: string[] = []): void => {
     let input = ''
     while (input.length < 15) {

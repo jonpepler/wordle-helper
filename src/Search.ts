@@ -156,4 +156,10 @@ export class Search {
         bestGuesses.map(({ word, score }) => `${word}(${score})`).join(', ')
     )
   }
+
+  chooseStartingWord(): void {
+    console.log()
+    const bestWord = this.makeBestGuesses([])[0]
+    console.log('Best starting word: ', bestWord.word, `(${bestWord.score})`)
+  }
 }
