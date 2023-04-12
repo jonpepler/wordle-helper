@@ -55,7 +55,7 @@ const runSearch = (solutions: string[]): void => {
 const getPossibleSolutions = async (): Promise<string[]> => {
   return await new Promise((resolve) => {
     https.get(
-      'https://static.nytimes.com/newsgraphics/2022/01/25/wordle-solver/assets/solutions.txt',
+      'https://gist.githubusercontent.com/cfreshman/d97dbe7004522f7bc52ed2a6e22e2c04/raw/633058e11743065ad2822e1d2e6505682a01a9e6/wordle-nyt-words-14855.txt',
       (res) => {
         let stream = ''
         res.on('data', (d) => {
@@ -72,7 +72,15 @@ const getPossibleSolutions = async (): Promise<string[]> => {
 
 const getPreviousSolutions = async (): Promise<string[]> => {
   return await new Promise((resolve) => {
-    https.get('https://www.rockpapershotgun.com/wordle-past-answers', (res) => {
+    const options = {
+      hostname: 'www.rockpapershotgun.com',
+      path: 'wordle-past-answers',
+      headers: {
+        'User-Agent':
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36'
+      }
+    }
+    https.get(options, (res) => {
       let stream = ''
       res.on('data', (d) => {
         // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
@@ -80,16 +88,13 @@ const getPreviousSolutions = async (): Promise<string[]> => {
       })
       res.on('end', () => {
         const $ = cheerio.load(stream)
-        const previousSolutionsHtml = $('.article_body_content > ul')
-          .slice(0, 2)
-          .text()
-          .split('\n')
-          .filter((text) => text !== '')
         resolve(
-          [
-            ...previousSolutionsHtml.slice(0, 7).map((text) => text.slice(-5)),
-            ...previousSolutionsHtml.slice(7)
-          ].map((text) => text.toLowerCase())
+          $('.article_body_content > ul.inline')
+            .slice(0, 2)
+            .text()
+            .split('\n')
+            .filter((text) => text !== '')
+            .map((text) => text.toLowerCase())
         )
       })
     })
